@@ -3,6 +3,5 @@ homebrew-profanity
 
 How-to use:
 
-* `brew tap robsalasco/homebrew-profanity`
-* `brew install libstrophe --HEAD`
-* `brew install profanity --HEAD`
+* `brew install bigx333/profanity/libmesode`
+* `brew install bigx333/profanity/profanity`
