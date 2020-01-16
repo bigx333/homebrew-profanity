@@ -1,52 +1,39 @@
-require 'formula'
-
 class Profanity < Formula
-  head 'https://github.com/boothj5/profanity.git', :using => :git
+  desc "Console based XMPP client"
+  homepage "https://profanity-im.github.io"
+  url "https://profanity-im.github.io/profanity-0.7.1.tar.gz"
+  sha256 "3fe442948ff2ee258681c3812e878d39179dcf92e1c67bc8fe0ef8896440b05b"
 
-  homepage 'https://github.com/boothj5/profanity'
+  head do
+    url "https://github.com/boothj5/profanity.git"
 
-  depends_on 'autoconf' => :build
-  depends_on 'automake' => :build
-  depends_on 'libtool' => :build
-  depends_on 'openssl' => :build
-  depends_on 'curl' => :build
-  depends_on 'glib' => :build
-  depends_on 'pkg-config' => :build
-  depends_on 'expat'
-  depends_on 'libstrophe'
-  depends_on 'libotr'
-  depends_on 'terminal-notifier'
+    depends_on "autoconf" => :build
+    depends_on "autoconf-archive" => :build
+    depends_on "automake" => :build
+    depends_on "libtool" => :build
+  end
 
+  depends_on "pkg-config" => :build
+  depends_on "glib"
+  depends_on "gnutls"
+  depends_on "gpgme"
+  depends_on "libotr"
+  depends_on "libmesode"
+  depends_on "openssl@1.1"
+  depends_on "readline"
+  depends_on "terminal-notifier"
+  depends_on "libsignal-protocol-c"
 
   def install
-        generate_version
-        ENV.append 'LIBS', "-L#{HOMEBREW_PREFIX}/opt/gettext/lib"
-        ENV.append 'CFLAGS', "-L#{HOMEBREW_PREFIX}/opt/gettext/include"
-        ENV.append 'ncursesw_LIBS', "-L#{HOMEBREW_PREFIX}/opt/ncurses/lib"
-        ENV.append 'ncursesw_CFLAGS',"-I#{HOMEBREW_PREFIX}/opt/ncurses/include"
-        ENV.append 'ncurses_LIBS', "-L#{HOMEBREW_PREFIX}/opt/ncurses/lib"
-        ENV.append 'ncurses_CFLAGS',"-I#{HOMEBREW_PREFIX}/opt/ncurses/include"
-        ENV.append 'curl_LIBS', "-L#{HOMEBREW_PREFIX}/opt/curl/lib"
-        ENV.append 'curl_CFLAGS',"-I#{HOMEBREW_PREFIX}/opt/curl/include"
-        system "cp -r #{git_cache}/.git .git"
-        system "./bootstrap.sh --prefix=#{prefix}"
-        system "./configure --prefix=#{prefix}"
-        system "make", "PREFIX=#{prefix}", "install"
-    end
-
-  private
-
-  def generate_version
-    ohai "Generating VERSION from the Homebrew's git cache"
-    File.open('VERSION', 'w') {|f| f.write(git_revision) }
+    system "./bootstrap.sh" if build.head?
+    system "./configure", "--disable-dependency-tracking",
+                          "--disable-silent-rules",
+                          "--enable-omemo",
+                          "--prefix=#{prefix}"
+    system "make", "install"
   end
 
-  def git_revision
-    `cd #{git_cache} && git describe --match "v[0-9]*" --always`.strip
+  test do
+    system "#{bin}/profanity", "-v"
   end
-
-  def git_cache
-    cached_download
-  end
-
 end
